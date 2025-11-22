@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ActorSystem {
     private final Map<String, Actor> actors = new ConcurrentHashMap<>();
     private final BlockingQueue<ActorMessage> messageQueue = new LinkedBlockingQueue<>();
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private final AtomicBoolean running = new AtomicBoolean(true);
 
     public ActorSystem() {

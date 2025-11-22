@@ -17,4 +17,5 @@ public record EONETEvent(
 ) {
 }
 
-record Source(String id, String url) {}
+record Source(String id, String url) {
+}

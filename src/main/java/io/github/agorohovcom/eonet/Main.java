@@ -4,8 +4,6 @@ import io.github.agorohovcom.eonet.actor.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Scanner;
-
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
@@ -24,8 +22,8 @@ public class Main {
         log.info("Starting periodic polling (every 10 seconds)...");
         system.sendMessage("scheduler", new StartPolling());
 
-        // Ждем 5 минут, затем останавливаем
-        Thread.sleep(300000); // 5 минут
+        // Ждем 1 минуту, затем останавливаем
+        Thread.sleep(60000); // 1 минута
 
         // Останавливаем систему
         system.sendMessage("scheduler", new StopPolling());

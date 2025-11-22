@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class EventProcessorActor implements Actor {
+public class EventProcessorActor extends MethodHandleActor {
     private static final Logger log = LoggerFactory.getLogger(EventProcessorActor.class);
 
     private final ActorSystem system;
@@ -20,30 +20,29 @@ public class EventProcessorActor implements Actor {
         this.nextActor = nextActor;
     }
 
-    @Override
-    public void onMessage(Object message) {
-        if (message instanceof EventsFetched fetched) {
-            List<EONETEvent> events = fetched.response().events();
-            log.info("Processing {} events", events.size());
+    @Handle
+    public void handleEventsFetched(EventsFetched message) {
+        List<EONETEvent> events = message.response().events();
+        log.info("Processing {} events", events.size());
 
-            // Группируем события по категориям
-            Map<String, Long> eventsByCategory = events.stream()
-                    .flatMap(event -> event.categories().stream())
-                    .collect(Collectors.groupingBy(
-                            EventCategory::title,
-                            Collectors.counting()
-                    ));
+        Map<String, Long> eventsByCategory = events.stream()
+                .flatMap(event -> event.categories().stream())
+                .collect(Collectors.groupingBy(
+                        EventCategory::title,
+                        Collectors.counting()
+                ));
 
-            // Добавляем категории с нулевым количеством для полноты
-            addMissingCategories(eventsByCategory);
+        addMissingCategories(eventsByCategory);
+        system.sendMessage(nextActor, new StatisticsUpdate(eventsByCategory, events.size()));
+    }
 
-            // Отправляем статистику следующему актору
-            system.sendMessage(nextActor, new StatisticsUpdate(eventsByCategory, events.size()));
-        }
+    @Handle
+    public void handlePollingError(PollingError message) {
+        log.error("Processing polling error: {}", message.error());
+        system.sendMessage(nextActor, new ProcessingError("Failed to process events: " + message.error()));
     }
 
     private void addMissingCategories(Map<String, Long> eventsByCategory) {
-        // Все возможные категории EONET
         String[] allCategories = {
                 "Wildfires", "Severe Storms", "Volcanoes",
                 "Dust and Haze", "Manmade", "Sea and Lake Ice",

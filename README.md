@@ -30,22 +30,6 @@ Actors handle concurrency the simple, safe way:
 * Communication only through immutable messages
 * Zero race conditions
 
-```java
-// Each actor is like a mini-program with its own state
-public class EventProcessorActor implements Actor {
-private Map<String, Integer> counts = new HashMap<>(); // 🎉 No synchronization needed!
-
-    @Override
-    public void onMessage(Object message) {
-        // ✅ Only one message processed at a time
-        // ✅ No race conditions ever!
-        if (message instanceof NewEvent event) {
-            counts.merge(event.type(), 1, Integer::sum);
-        }
-    }
-}
-```
-
 ## 📊 See Earth in Action!
 When you run the system, you'll see something like this:
 

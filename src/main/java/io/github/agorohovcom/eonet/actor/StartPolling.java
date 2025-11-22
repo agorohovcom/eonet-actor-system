@@ -1,3 +1,4 @@
 package io.github.agorohovcom.eonet.actor;
 
-public record StartPolling() {}
+public record StartPolling() {
+}

@@ -10,4 +10,5 @@ public record EONETResponse(
         String description,
         String link,
         List<EONETEvent> events
-) {}
+) {
+}

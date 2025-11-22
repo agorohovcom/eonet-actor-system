@@ -14,8 +14,8 @@ public abstract class MethodHandleActor implements Actor {
     private static final Logger log = LoggerFactory.getLogger(MethodHandleActor.class);
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
-
     private final Map<Class<?>, MethodHandle> handlerMap = new HashMap<>();
+
     private boolean initialized = false;
 
     protected MethodHandleActor() {
@@ -48,13 +48,15 @@ public abstract class MethodHandleActor implements Actor {
 
         Class<?> messageType = parameterTypes[0];
 
-        // Создаем MethodHandle
         MethodHandle handle;
         try {
             handle = LOOKUP.findVirtual(
                     getClass(),
                     method.getName(),
-                    MethodType.methodType(void.class, messageType)
+                    MethodType.methodType(
+                            void.class,
+                            messageType
+                    )
             );
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -93,10 +95,5 @@ public abstract class MethodHandleActor implements Actor {
 
     protected void handleHandlerError(Object message, Throwable error) {
         log.error("Error processing message of type: {}", message.getClass().getSimpleName(), error);
-    }
-
-    // Метод для динамической регистрации хендлеров (опционально)
-    protected final void registerHandler(Class<?> messageType, MethodHandle handler) {
-        handlerMap.put(messageType, handler.bindTo(this));
     }
 }

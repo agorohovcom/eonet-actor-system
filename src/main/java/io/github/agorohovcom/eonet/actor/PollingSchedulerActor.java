@@ -1,6 +1,6 @@
 package io.github.agorohovcom.eonet.actor;
 
-public class PollingSchedulerActor implements Actor {
+public class PollingSchedulerActor extends MethodHandleActor {
     private final ActorSystem system;
     private final String pollerActor;
 
@@ -12,13 +12,14 @@ public class PollingSchedulerActor implements Actor {
         this.pollerActor = pollerActor;
     }
 
-    @Override
-    public void onMessage(Object message) {
-        if (message instanceof StartPolling) {
-            startPeriodicPolling();
-        } else if (message instanceof StopPolling) {
-            stopPeriodicPolling();
-        }
+    @Handle
+    public void handleStartPolling(StartPolling message) {
+        startPeriodicPolling();
+    }
+
+    @Handle
+    public void handleStopPolling(StopPolling message) {
+        stopPeriodicPolling();
     }
 
     private void startPeriodicPolling() {
@@ -38,10 +39,9 @@ public class PollingSchedulerActor implements Actor {
 
         scheduledPolls++;
 
-        // Запускаем в отдельном потоке, чтобы не блокировать акторную систему
         new Thread(() -> {
             try {
-                Thread.sleep(10000); // 10 секунд между опросами
+                Thread.sleep(10000);
                 if (running) {
                     system.sendMessage(pollerActor, new StartPolling());
                     scheduleNextPoll();

@@ -10,25 +10,19 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         log.info("EONET Console Tracker starting...");
 
-        ActorSystem system = new ActorSystem();
+        // Вариант 1: Простой запуск с дефолтным конфигом
+        ActorOrchestrator orchestrator = ActorOrchestrator.create();
+        orchestrator.start();
 
-        // Создаем цепочку акторов
-        system.createActor("dashboard", new DashboardActor());
-        system.createActor("processor", new EventProcessorActor(system, "dashboard"));
-        system.createActor("poller", new EONETPollerActor(system, "processor"));
-        system.createActor("scheduler", new PollingSchedulerActor(system, "poller"));
-
-        // Запускаем периодический опрос
-        log.info("Starting periodic polling (every 10 seconds)...");
-        system.sendMessage("scheduler", new StartPolling());
-
-        // Ждем 1 минуту, затем останавливаем
-        Thread.sleep(60000); // 1 минута
-
-        // Останавливаем систему
-        system.sendMessage("scheduler", new StopPolling());
-        Thread.sleep(2000); // Даем время на завершение
-        system.shutdown();
+        // Вариант 2: С кастомным конфигом
+        // ActorSystemConfig config = new ActorSystemConfig(
+        //     4,
+        //     Duration.ofSeconds(3),
+        //     Duration.ofSeconds(15),
+        //     Duration.ofMinutes(2)
+        // );
+        // ActorOrchestrator orchestrator = ActorOrchestrator.create(config);
+        // orchestrator.start();
 
         log.info("EONET Console Tracker finished");
     }

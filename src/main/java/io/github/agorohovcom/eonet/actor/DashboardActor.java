@@ -1,5 +1,6 @@
 package io.github.agorohovcom.eonet.actor;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -7,6 +8,15 @@ public class DashboardActor extends MethodHandleActor {
     private StatisticsUpdate lastStats;
     private int updateCount = 0;
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private final Duration pollingInterval;
+    private final Duration applicationRunTime;
+    private LocalDateTime startTime;
+
+    public DashboardActor(Duration pollingInterval, Duration applicationRunTime) {
+        this.pollingInterval = pollingInterval;
+        this.applicationRunTime = applicationRunTime;
+        this.startTime = LocalDateTime.now();
+    }
 
     @Handle
     public void handleStatisticsUpdate(StatisticsUpdate message) {
@@ -24,8 +34,16 @@ public class DashboardActor extends MethodHandleActor {
     }
 
     private void displayDashboard() {
+        LocalDateTime now = LocalDateTime.now();
+        Duration elapsed = Duration.between(startTime, now);
+        Duration remaining = applicationRunTime.minus(elapsed);
+
+        long secondsRemaining = remaining.getSeconds();
+        long minutes = secondsRemaining / 60;
+        long seconds = secondsRemaining % 60;
+
         System.out.println("\n=== EONET EVENT STATISTICS ===");
-        System.out.println("Update #" + updateCount + " at " + LocalDateTime.now().format(timeFormatter));
+        System.out.println("Update #" + updateCount + " at " + now.format(timeFormatter));
         System.out.println();
 
         if (lastStats != null) {
@@ -40,22 +58,22 @@ public class DashboardActor extends MethodHandleActor {
                         long count = entry.getValue();
                         int percentage = lastStats.totalEvents() > 0 ?
                                 (int) ((count * 100) / lastStats.totalEvents()) : 0;
-                        String bar = generateProgressBar(percentage, 20);
+                        String bar = generateProgressBar(percentage);
                         System.out.printf("  %-20s: %3d %s %d%%%n", category, count, bar, percentage);
                     });
         }
 
         System.out.println();
-        System.out.println("Data updates every 10 seconds");
-        System.out.println("App will stop in 1 minute");
+        System.out.println("Data updates every " + pollingInterval.getSeconds() + " seconds");
+        System.out.printf("App will stop in %d:%02d%n", minutes, seconds);
         System.out.println("==============================");
     }
 
-    private String generateProgressBar(int percentage, int length) {
-        int bars = (percentage * length) / 100;
+    private String generateProgressBar(int percentage) {
+        int bars = (percentage * 20) / 100;
         StringBuilder bar = new StringBuilder();
         bar.append("[");
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < 20; i++) {
             bar.append(i < bars ? "#" : " ");
         }
         bar.append("]");

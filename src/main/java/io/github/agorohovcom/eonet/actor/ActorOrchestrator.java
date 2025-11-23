@@ -14,11 +14,15 @@ public class ActorOrchestrator {
 
     private ActorOrchestrator(ActorSystemConfig config) {
         this.config = config;
-        this.system = new ActorSystem();
+        this.system = new ActorSystem(config);
     }
 
     public static ActorOrchestrator create() {
         return new ActorOrchestrator(new ActorSystemConfig());
+    }
+
+    public static ActorOrchestrator create(ActorSystemConfig config) {
+        return new ActorOrchestrator(config);
     }
 
     public void start() {

@@ -35,18 +35,22 @@ When you run the system, you'll see something like this:
 
 ```text
 === EONET EVENT STATISTICS ===
-Update #12 at 14:30:25
+Update #5 at 17:48:59
 
-Total events: 67
+Total events: 54
 
 Events by category:
-Wildfires         :  35 [####################] 52%
-Sea and Lake Ice  :  22 [##############      ] 32%
-Severe Storms     :   8 [#####               ] 11%
-Volcanoes         :   2 [#                   ] 2%
-Dust and Haze     :   0 [                    ] 0%
+  Wildfires           :  30 [###########         ] 55%
+  Sea and Lake Ice    :  23 [########            ] 42%
+  Severe Storms       :   1 [                    ] 1%
+  Water Color         :   0 [                    ] 0%
+  Dust and Haze       :   0 [                    ] 0%
+  Snow                :   0 [                    ] 0%
+  Manmade             :   0 [                    ] 0%
+  Volcanoes           :   0 [                    ] 0%
 
 Data updates every 10 seconds
+App will stop in 0:18
 ==============================
 ```
 ## 🌍 Happy hacking — and enjoy watching the planet breathe in real time!
